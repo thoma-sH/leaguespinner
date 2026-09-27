@@ -1,0 +1,108 @@
+<title>The Grand Line Draft</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="styles.css">
+
+<canvas id="fx" class="fx" aria-hidden="true"></canvas>
+<div class="flash" id="flash" aria-hidden="true"></div>
+
+<div class="shell" id="shell">
+
+  <header class="masthead">
+    <div class="brand">
+      <svg class="brand-skull" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 2c6 0 8.6 4 8.6 8.4 0 3-1.7 5-3.6 5.9v2.3c0 1.2-1 2.2-2.2 2.2H9.2C8 20.8 7 19.8 7 18.6v-2.3C5.1 15.4 3.4 13.4 3.4 10.4 3.4 6 6 2 12 2Z" fill="currentColor"/>
+        <circle cx="8.7" cy="10.6" r="2.4" fill="#131316"/>
+        <circle cx="15.3" cy="10.6" r="2.4" fill="#131316"/>
+        <path d="M12 13.4 10.6 16.6h2.8Z" fill="#131316"/>
+      </svg>
+      <h1 class="wordmark">The Grand Line Draft</h1>
+    </div>
+    <div class="head-right">
+      <p class="tally" id="playerCount">0 players</p>
+      <button type="button" id="soundBtn" class="icon-btn" aria-pressed="true" title="Sound on">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 9h3l5-4v14l-5-4H4z" fill="currentColor"/>
+          <g class="ico-waves" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M16 9.5a4 4 0 0 1 0 5"/>
+            <path d="M18.5 7a7.5 7.5 0 0 1 0 10"/>
+          </g>
+          <path class="ico-slash" d="M17 8.5l5 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+        </svg>
+        <span class="sr">Toggle sound</span>
+      </button>
+    </div>
+  </header>
+
+  <section class="setup" aria-label="Players">
+    <form class="add-form" id="addForm">
+      <input id="nameInput" class="text-in" type="text" autocomplete="off" spellcheck="false"
+             placeholder="Add a player" aria-label="Add a player">
+      <button type="submit" class="btn btn-line">Add</button>
+    </form>
+
+    <div class="setup-opts">
+      <label class="sel">
+        <span class="sr">Team size</span>
+        <select id="formatSel">
+          <option value="auto">Split evenly</option>
+          <option value="2">2 v 2</option>
+          <option value="3">3 v 3</option>
+          <option value="4">4 v 4</option>
+          <option value="5">5 v 5</option>
+        </select>
+      </label>
+
+      <label class="check">
+        <input type="checkbox" id="lanesToggle" checked>
+        <span class="box" aria-hidden="true"></span>
+        <span>Random lanes</span>
+      </label>
+
+      <button type="button" class="text-btn" id="clearBtn">Clear all</button>
+    </div>
+
+    <ol class="chips" id="rosterChips"></ol>
+  </section>
+
+  <div class="board">
+    <section class="side side-blue" id="crewA" aria-label="Blue side"></section>
+
+    <div class="middle">
+      <div class="wheel-wrap">
+        <canvas id="wheel" class="wheel" aria-label="Draft wheel"></canvas>
+        <div class="pick" id="pickCard" hidden>
+          <p class="pick-name" id="pickName">—</p>
+          <p class="pick-side" id="pickSide">—</p>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button type="button" class="btn btn-go" id="spinBtn"><span>Spin</span></button>
+        <p class="status" id="status">Add at least 4 players</p>
+        <button type="button" class="text-btn" id="resetBtn" hidden>Start over</button>
+      </div>
+    </div>
+
+    <section class="side side-red" id="crewB" aria-label="Red side"></section>
+  </div>
+
+  <div class="bench" id="reserveRow" hidden>
+    <h2 class="bench-label">Spectating</h2>
+    <div class="tags" id="reserveNames"></div>
+  </div>
+
+  <div class="copy-out" id="copyOut" hidden>
+    <p class="hint">Your browser blocked the clipboard — select and copy this:</p>
+    <textarea id="copyText" rows="9" readonly></textarea>
+  </div>
+
+  <footer class="footsie">
+    <p>Fan-made for The Grand Line. Not affiliated with Riot Games.</p>
+  </footer>
+</div>
+
+<script src="audio.js"></script>
+<script src="wheel.js"></script>
+<script src="app.js"></script>
