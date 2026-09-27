@@ -15,14 +15,18 @@ both sides are full.
 - `Space`, the Spin button, or a click on the wheel turns it
 - **Split evenly** halves the roster; a fixed size (2v2–5v5) sends whoever is left
   over to Spectating, drafted last
+- Names you have used before come back as **Recent** — one click to add, and the
+  list narrows as you type. `↓` from the input steps into it; `×` forgets one,
+  `Forget all` clears the lot
 - Click the title to rename it — any group can make it theirs. It is remembered,
   and it heads the copied block too
 - The first pick on each side is marked `C`
 - **Copy teams** puts a clean block on the clipboard, ready to paste in Discord
 - Editing the roster restarts the draft
 
-Roster, team size, lanes and sound are remembered per browser, so it is only empty
-the first time.
+Roster, team size, lanes, sound and the title are remembered per browser, so it is
+only empty the first time. Remembered names live under their own storage key, so
+**Clear all** empties the lobby without forgetting anyone.
 
 ## Running it
 

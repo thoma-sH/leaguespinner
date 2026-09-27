@@ -20,6 +20,10 @@ const LANES = ['Top', 'Jungle', 'Mid', 'Bot', 'Support'];
 const MAX_ROSTER = 16;
 const STORE_KEY = 'grandline.draft.v4';
 const DEFAULT_TITLE = 'The Grand Line Draft';
+/* Kept apart from the draft state: clearing the lobby must not wipe the history. */
+const NAMES_KEY = 'grandline.names.v1';
+const MAX_REMEMBERED = 60;
+const MAX_SUGGESTED = 12;
 const MAX_TITLE = 48;
 const SIDES = [
   { name: 'Blue side', color: '#2f7ad6' },
@@ -49,6 +53,7 @@ const state = {
 
 let wheel;
 let fx;
+let remembered = [];
 
 /* ---------- persistence (per-viewer convenience only) ---------- */
 
@@ -75,6 +80,60 @@ function load() {
     if (typeof d.lanes === 'boolean') state.lanes = d.lanes;
     if (typeof d.sound === 'boolean') state.sound = d.sound;
   } catch (e) { /* ignore unreadable storage */ }
+}
+
+/* ---------- remembered names ---------- */
+
+function loadRemembered() {
+  try {
+    const d = JSON.parse(localStorage.getItem(NAMES_KEY) || '[]');
+    if (Array.isArray(d)) {
+      remembered = d.filter((x) => typeof x === 'string' && x.trim()).slice(0, MAX_REMEMBERED);
+    }
+  } catch (e) { /* unreadable storage — suggestions just stay empty */ }
+}
+
+function saveRemembered() {
+  try {
+    localStorage.setItem(NAMES_KEY, JSON.stringify(remembered));
+  } catch (e) { /* blocked storage — the page works without it */ }
+}
+
+/* Most recently used first, so the regulars stay at the front. */
+function remember(name) {
+  const lower = name.toLowerCase();
+  remembered = [name, ...remembered.filter((x) => x.toLowerCase() !== lower)].slice(0, MAX_REMEMBERED);
+  saveRemembered();
+}
+
+function forget(name) {
+  const lower = name.toLowerCase();
+  remembered = remembered.filter((x) => x.toLowerCase() !== lower);
+  saveRemembered();
+  renderRecents();
+}
+
+/* Anyone already in the lobby is not worth offering again. */
+function suggestions() {
+  const q = $('#nameInput').value.trim().toLowerCase();
+  const playing = new Set(state.roster.map((x) => x.toLowerCase()));
+  let list = remembered.filter((x) => !playing.has(x.toLowerCase()));
+  if (q) {
+    list = list.filter((x) => x.toLowerCase().includes(q));
+    const rank = (x) => (x.toLowerCase().startsWith(q) ? 0 : 1);
+    list.sort((a, b) => rank(a) - rank(b));
+  }
+  return list.slice(0, MAX_SUGGESTED);
+}
+
+function renderRecents() {
+  const list = suggestions();
+  $('#recents').hidden = list.length === 0;
+  $('#recentsList').innerHTML = list.map((name) => `
+    <span class="recent">
+      <button type="button" class="recent-add" data-add="${esc(name)}">${esc(name)}</button>
+      <button type="button" class="recent-x" data-forget="${esc(name)}" aria-label="Forget ${esc(name)}">×</button>
+    </span>`).join('');
 }
 
 /* ---------- the split ---------- */
@@ -128,6 +187,7 @@ function resetDraft() {
 
 function render(fresh) {
   renderRoster();
+  renderRecents();
   renderSides(fresh);
   renderBench();
   renderControls();
@@ -291,6 +351,7 @@ function addNames(raw) {
       name = `${base} ${n++}`;
     }
     state.roster.push(name);
+    remember(name);
     added++;
   }
   if (added) {
@@ -437,6 +498,55 @@ function wire() {
     input.focus();
   });
 
+  const input = $('#nameInput');
+  input.addEventListener('input', renderRecents);
+  input.addEventListener('keydown', (e) => {
+    if (e.key !== 'ArrowDown') return;
+    const first = $('.recent-add');
+    if (first) {
+      e.preventDefault();
+      first.focus();
+    }
+  });
+
+  $('#recentsList').addEventListener('click', (e) => {
+    const add = e.target.closest('[data-add]');
+    if (add) {
+      input.value = '';
+      addNames(add.dataset.add);
+      input.focus();
+      return;
+    }
+    const drop = e.target.closest('[data-forget]');
+    if (drop) {
+      Sfx.click();
+      forget(drop.dataset.forget);
+    }
+  });
+
+  $('#recentsList').addEventListener('keydown', (e) => {
+    const btns = $$('.recent-add');
+    const i = btns.indexOf(document.activeElement);
+    if (i < 0) return;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      (btns[i + 1] || btns[0]).focus();
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      (btns[i - 1] || btns[btns.length - 1]).focus();
+    } else if (e.key === 'ArrowUp' || e.key === 'Escape') {
+      e.preventDefault();
+      input.focus();
+    }
+  });
+
+  $('#forgetBtn').addEventListener('click', () => {
+    remembered = [];
+    saveRemembered();
+    renderRecents();
+    Sfx.click();
+  });
+
   $('#rosterChips').addEventListener('click', (e) => {
     const btn = e.target.closest('[data-drop]');
     if (!btn) return;
@@ -491,6 +601,7 @@ function wire() {
 
 function boot(restored) {
   load();
+  loadRemembered();
   if (restored && restored.state) Object.assign(state, restored.state);
 
   wheel = new Wheel($('#wheel'), { onTick: () => Sfx.tick() });

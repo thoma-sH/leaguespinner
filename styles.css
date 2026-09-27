@@ -183,6 +183,43 @@ body {
 
 .setup-opts { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 20px; }
 
+/* Names this browser has seen before. Dashed, so they read as offers rather
+   than as players already on the list. */
+.recents { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; }
+.recents-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--grey-dim);
+}
+.recents-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.recent {
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px dashed var(--edge);
+  border-radius: 2px;
+  transition: border-color 140ms ease;
+}
+.recent:hover { border-style: solid; border-color: var(--grey); }
+.recent-add,
+.recent-x {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: var(--ui);
+  color: var(--grey);
+  cursor: pointer;
+  transition: color 140ms ease, background 140ms ease;
+}
+.recent-add { padding: 5px 4px 6px 10px; font-size: 0.9rem; font-weight: 500; }
+.recent-add::before { content: '+'; margin-right: 6px; color: var(--grey-dim); }
+.recent-add:hover { color: var(--bone); }
+.recent-x { width: 20px; font-size: 0.95rem; line-height: 1; color: var(--grey-dim); }
+.recent-x:hover { background: var(--red); color: var(--bone); }
+.recent-add:focus-visible,
+.recent-x:focus-visible { outline: 2px solid var(--bone); outline-offset: -1px; }
+
 .sel { position: relative; display: inline-flex; }
 .sel::after {
   content: '';
