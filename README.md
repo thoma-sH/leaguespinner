@@ -3,7 +3,8 @@
 A spinning-wheel team randomiser for League customs. Put 4–16 players in, spin, and
 it splits them into blue side and red side with random lanes.
 
-**Live: <https://thoma-sh.github.io/leaguespinner/>**
+**Live: <https://leaguespinner.vercel.app>**  
+Mirror: <https://thoma-sh.github.io/leaguespinner/>
 
 ## Using it
 
@@ -30,23 +31,15 @@ first click, per browser autoplay rules.
 
 ## Deploying
 
-It is already live on GitHub Pages from `main`, and every push republishes it.
+Both hosts are wired to `main`, so a push republishes to both. No build step and no
+framework preset — it is a plain static site.
 
-A plain static site, so Vercel works too, with no build step and no framework preset.
+- **Vercel** (primary) — connected through the GitHub integration
+- **GitHub Pages** (mirror) — served from the root of `main`
 
-**Dashboard (recommended — every push to `main` redeploys):**
-
-1. Go to <https://vercel.com/new>
-2. Import `thoma-sH/leaguespinner`
-3. Leave every default alone — no framework, no build command, no output directory
-4. Deploy
-
-**Or from the terminal:**
-
-```sh
-npx vercel@latest login
-npx vercel@latest --prod
-```
+`vercel.json` turns on `cleanUrls` and sends `Cache-Control: max-age=0,
+must-revalidate`, so a push shows up on the live site immediately instead of sitting
+behind a stale cache.
 
 `vercel.json` turns on `cleanUrls` and sends `Cache-Control: max-age=0,
 must-revalidate`, so a push shows up on the live site immediately instead of
