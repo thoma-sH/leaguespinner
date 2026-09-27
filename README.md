@@ -3,7 +3,7 @@
 A spinning-wheel team randomiser for League customs. Put 4–16 players in, spin, and
 it splits them into blue side and red side with random lanes.
 
-Live: https://claude.ai/artifact/4VpBGswQEGKzwtZfkSqNCT
+**Live: <https://thoma-sh.github.io/leaguespinner/>**
 
 ## Using it
 
@@ -30,7 +30,9 @@ first click, per browser autoplay rules.
 
 ## Deploying
 
-A plain static site, so Vercel needs no build step and no framework preset.
+It is already live on GitHub Pages from `main`, and every push republishes it.
+
+A plain static site, so Vercel works too, with no build step and no framework preset.
 
 **Dashboard (recommended — every push to `main` redeploys):**
 
