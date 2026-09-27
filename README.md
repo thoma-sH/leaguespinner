@@ -28,10 +28,27 @@ Static site, no build step, no dependencies. Open `index.html`.
 Sound is synthesised with the Web Audio API — no audio files — and unlocks on your
 first click, per browser autoplay rules.
 
-## Hosting it
+## Deploying
 
-Drag the folder onto [Netlify Drop](https://app.netlify.com/drop), or push it to a
-GitHub repo and turn on Pages (root of `main`). No config.
+A plain static site, so Vercel needs no build step and no framework preset.
+
+**Dashboard (recommended — every push to `main` redeploys):**
+
+1. Go to <https://vercel.com/new>
+2. Import `thoma-sH/leaguespinner`
+3. Leave every default alone — no framework, no build command, no output directory
+4. Deploy
+
+**Or from the terminal:**
+
+```sh
+npx vercel@latest login
+npx vercel@latest --prod
+```
+
+`vercel.json` turns on `cleanUrls` and sends `Cache-Control: max-age=0,
+must-revalidate`, so a push shows up on the live site immediately instead of
+sitting behind a stale cache.
 
 ## Files
 
