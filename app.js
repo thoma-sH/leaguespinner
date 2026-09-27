@@ -19,6 +19,8 @@ function shuffle(arr) {
 const LANES = ['Top', 'Jungle', 'Mid', 'Bot', 'Support'];
 const MAX_ROSTER = 16;
 const STORE_KEY = 'grandline.draft.v4';
+const DEFAULT_TITLE = 'The Grand Line Draft';
+const MAX_TITLE = 48;
 const SIDES = [
   { name: 'Blue side', color: '#2f7ad6' },
   { name: 'Red side', color: '#dc4436' }
@@ -26,6 +28,7 @@ const SIDES = [
 const BENCH_COLOR = '#90909a';
 
 const state = {
+  title: DEFAULT_TITLE,
   roster: [],
   format: 'auto',
   lanes: true,
@@ -49,6 +52,7 @@ let fx;
 function save() {
   try {
     localStorage.setItem(STORE_KEY, JSON.stringify({
+      title: state.title,
       roster: state.roster,
       format: state.format,
       lanes: state.lanes,
@@ -62,6 +66,7 @@ function load() {
     const raw = localStorage.getItem(STORE_KEY);
     if (!raw) return;
     const d = JSON.parse(raw);
+    if (typeof d.title === 'string' && d.title.trim()) state.title = d.title.slice(0, MAX_TITLE);
     if (Array.isArray(d.roster)) state.roster = d.roster.slice(0, MAX_ROSTER);
     if (d.format) state.format = d.format;
     if (typeof d.lanes === 'boolean') state.lanes = d.lanes;
@@ -215,6 +220,60 @@ function renderControls() {
   }
 }
 
+/* ---------- the title ---------- */
+
+/* Written into the heading and the browser tab, but never while it is being
+   typed into — that would fight the caret. */
+function applyTitle() {
+  const el = $('#wordmark');
+  if (document.activeElement !== el) el.textContent = state.title;
+  document.title = state.title;
+}
+
+function commitTitle() {
+  const el = $('#wordmark');
+  const next = el.textContent.replace(/\s+/g, ' ').trim().slice(0, MAX_TITLE);
+  state.title = next || DEFAULT_TITLE;
+  el.textContent = state.title;
+  document.title = state.title;
+  save();
+}
+
+function wireTitle() {
+  const el = $('#wordmark');
+
+  /* Firefox only gained plaintext-only recently; fall back to filtering pastes. */
+  if (el.contentEditable !== 'plaintext-only') {
+    el.setAttribute('contenteditable', 'true');
+    el.addEventListener('paste', (e) => {
+      e.preventDefault();
+      const text = (e.clipboardData || window.clipboardData).getData('text').replace(/\s+/g, ' ');
+      document.execCommand('insertText', false, text);
+    });
+  }
+
+  el.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      el.blur();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      el.textContent = state.title;
+      el.blur();
+    }
+  });
+  el.addEventListener('blur', commitTitle);
+
+  $('#renameBtn').addEventListener('click', () => {
+    el.focus();
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  });
+}
+
 /* ---------- roster editing ---------- */
 
 function addNames(raw) {
@@ -324,7 +383,7 @@ async function doSpin() {
 /* ---------- export ---------- */
 
 function teamsText() {
-  const out = ['**THE GRAND LINE DRAFT**', ''];
+  const out = [`**${state.title.toUpperCase()}**`, ''];
   [0, 1].forEach((side) => {
     out.push(`**${SIDES[side].name.toUpperCase()}**`);
     state.teams[side].forEach((name, i) => {
@@ -418,7 +477,7 @@ function wire() {
   $('#soundBtn').addEventListener('click', () => setSound(!state.sound));
 
   document.addEventListener('keydown', (e) => {
-    if (e.code !== 'Space' || e.target.closest('input, textarea, button, select')) return;
+    if (e.code !== 'Space' || e.target.closest('input, textarea, button, select, [contenteditable]')) return;
     if (state.busy || state.done || !state.seq.length) return;
     e.preventDefault();
     doSpin();
@@ -435,6 +494,8 @@ function boot(restored) {
   fx = new Fx($('#fx'));
 
   wire();
+  wireTitle();
+  applyTitle();
   $('#formatSel').value = state.format;
   $('#lanesToggle').checked = state.lanes;
   setSound(state.sound);

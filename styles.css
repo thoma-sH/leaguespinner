@@ -87,7 +87,7 @@ body {
   padding-bottom: clamp(12px, 1.8vw, 18px);
   border-bottom: 2px solid rgba(240, 237, 230, 0.22);
 }
-.brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .brand-skull { width: clamp(24px, 4vw, 34px); height: auto; flex: none; color: var(--bone); }
 .wordmark {
   margin: 0;
@@ -98,6 +98,40 @@ body {
   text-transform: uppercase;
   color: var(--bone);
 }
+
+/* the title is renameable in place */
+.wordmark[contenteditable] {
+  padding: 1px 5px;
+  margin-left: -5px;
+  border-radius: 2px;
+  cursor: text;
+  transition: background 160ms ease, box-shadow 160ms ease;
+}
+.wordmark[contenteditable]:hover { background: var(--fill); }
+.wordmark[contenteditable]:focus {
+  outline: none;
+  background: var(--fill-2);
+  box-shadow: inset 0 -2px 0 var(--bone);
+}
+
+.rename {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 28px; height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  color: var(--grey-dim);
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 160ms ease, color 160ms ease, background 160ms ease;
+}
+.rename svg { width: 15px; height: 15px; }
+.brand:hover .rename { opacity: 1; }
+.rename:hover { color: var(--bone); background: var(--fill-2); }
+.rename:focus-visible { opacity: 1; outline: 2px solid var(--bone); outline-offset: 1px; }
 
 .head-right { display: flex; align-items: center; gap: 14px; flex: none; }
 .tally { margin: 0; font-size: 0.88rem; font-weight: 500; color: var(--grey); white-space: nowrap; }

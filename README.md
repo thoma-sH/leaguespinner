@@ -15,6 +15,8 @@ both sides are full.
 - `Space`, the Spin button, or a click on the wheel turns it
 - **Split evenly** halves the roster; a fixed size (2v2–5v5) sends whoever is left
   over to Spectating, drafted last
+- Click the title to rename it — any group can make it theirs. It is remembered,
+  and it heads the copied block too
 - The first pick on each side is marked `C`
 - **Copy teams** puts a clean block on the clipboard, ready to paste in Discord
 - Editing the roster restarts the draft

@@ -38,7 +38,15 @@
         <circle cx="15.3" cy="10.6" r="2.4" fill="#131316"/>
         <path d="M12 13.4 10.6 16.6h2.8Z" fill="#131316"/>
       </svg>
-      <h1 class="wordmark">The Grand Line Draft</h1>
+      <h1 class="wordmark" id="wordmark" contenteditable="plaintext-only" spellcheck="false"
+          aria-label="Draft title — editable" title="Click to rename">The Grand Line Draft</h1>
+      <button type="button" class="rename" id="renameBtn" aria-label="Rename the draft" title="Rename">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 20h4L20 8l-4-4L4 16v4Z" fill="none" stroke="currentColor" stroke-width="1.8"
+                stroke-linejoin="round"/>
+          <path d="M14.5 5.5 18.5 9.5" fill="none" stroke="currentColor" stroke-width="1.8"/>
+        </svg>
+      </button>
     </div>
     <div class="head-right">
       <p class="tally" id="playerCount">0 players</p>
