@@ -26,6 +26,9 @@ const SIDES = [
   { name: 'Red side', color: '#dc4436' }
 ];
 const BENCH_COLOR = '#90909a';
+/* On the wheel a spectator lands on near-black rather than grey: bone labels stay
+   readable, and a hole in the spectrum reads as "no side" at a glance. */
+const BENCH_WEDGE = '#101014';
 
 const state = {
   title: DEFAULT_TITLE,
@@ -357,7 +360,7 @@ async function doSpin() {
 
   /* the landed wedge fills with the colour of the side it is feeding */
   const target = state.seq[0];
-  wheel.setTarget(target === 'B' ? BENCH_COLOR : SIDES[target].color);
+  wheel.setTarget(target === 'B' ? BENCH_WEDGE : SIDES[target].color);
 
   /* One player for one slot needs no theatre. */
   if (state.pool.length === 1) {

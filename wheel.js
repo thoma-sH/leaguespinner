@@ -5,7 +5,17 @@ const TAU = Math.PI * 2;
 
 const INK = '#101014';
 const PAPER = '#efece5';
-const PAPER_2 = '#dcd8cf';
+
+/* Evenly spaced hues right around the circle. Lightness is nudged per hue so
+   yellow does not glare and blue does not go murky, which keeps the near-black
+   labels legible on every wedge. */
+function wedgeColor(i, n, muted) {
+  const h = (i / n) * 360;
+  const l = 62 - 7 * Math.cos(((h - 55) * Math.PI) / 180);
+  return muted ? `hsl(${h.toFixed(1)} 28% 42%)` : `hsl(${h.toFixed(1)} 74% ${l.toFixed(1)}%)`;
+}
+
+const SPECTRUM = ['#e2453c', '#e8892a', '#e6c528', '#5cbd47', '#2f9fd6', '#4a5fd0', '#9b4fd0'];
 
 /* ---------- confetti ---------- */
 
@@ -31,7 +41,7 @@ class Fx {
 
   burst(x, y, opts = {}) {
     const n = REDUCED ? 8 : (opts.count || 90);
-    const colors = opts.colors || [PAPER, '#2f7ad6', '#dc4436'];
+    const colors = opts.colors || SPECTRUM.concat([PAPER]);
     for (let i = 0; i < n; i++) {
       const ang = opts.dir !== undefined
         ? opts.dir + (Math.random() - 0.5) * (opts.spread || 1.2)
@@ -244,19 +254,35 @@ class Wheel {
     ctx.fillStyle = PAPER;
     ctx.fill();
 
+    /* an empty wheel still reads as a wheel: a muted spectrum, no labels */
+    const blanks = n ? 0 : 12;
+    for (let i = 0; i < blanks; i++) {
+      const a0 = -Math.PI / 2 + (i / blanks) * TAU;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, R, a0, a0 + TAU / blanks);
+      ctx.closePath();
+      ctx.fillStyle = wedgeColor(i, blanks, true);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx + Math.cos(a0) * R, cy + Math.sin(a0) * R);
+      ctx.lineWidth = Math.max(1, s * 0.0035);
+      ctx.strokeStyle = INK;
+      ctx.stroke();
+    }
+
     for (let i = 0; i < n; i++) {
       const a0 = this.rot + i * seg;
       const a1 = a0 + seg;
       const isWin = i === this.winner;
 
-      if (isWin || i % 2 === 1) {
-        ctx.beginPath();
-        ctx.moveTo(cx, cy);
-        ctx.arc(cx, cy, R, a0, a1);
-        ctx.closePath();
-        ctx.fillStyle = isWin ? this.target : PAPER_2;
-        ctx.fill();
-      }
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, R, a0, a1);
+      ctx.closePath();
+      ctx.fillStyle = isWin ? this.target : wedgeColor(i, n, false);
+      ctx.fill();
 
       /* wedge divider */
       ctx.beginPath();
@@ -276,6 +302,18 @@ class Wheel {
       ctx.fillStyle = isWin ? PAPER : INK;
       ctx.fillText(label, R - s * 0.036, 0);
       ctx.restore();
+    }
+
+    /* outline the landed wedge, so a blue win never blurs into a blue neighbour */
+    if (this.winner >= 0 && this.winner < n) {
+      const a0 = this.rot + this.winner * seg;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, R, a0, a0 + seg);
+      ctx.closePath();
+      ctx.lineWidth = Math.max(2, s * 0.009);
+      ctx.strokeStyle = PAPER;
+      ctx.stroke();
     }
 
     /* the rim */
